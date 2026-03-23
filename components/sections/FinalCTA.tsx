@@ -3,8 +3,13 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Calendar } from "lucide-react";
 import Button from "../ui/Button";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function FinalCTA() {
+  const { user, setIsAuthModalOpen, setAuthMode } = useAuth();
+  const router = useRouter();
+
   return (
     <section className="relative py-24 overflow-hidden">
       {/* Background with Dark Gradient */}
@@ -42,7 +47,18 @@ export default function FinalCTA() {
               }}
               className="rounded-lg"
             >
-              <Button size="xl" className="w-full sm:w-auto shadow-xl">
+              <Button 
+                size="xl" 
+                className="w-full sm:w-auto shadow-xl"
+                onClick={() => {
+                  if (user) {
+                    router.push("/dashboard");
+                  } else {
+                    setAuthMode("signup");
+                    setIsAuthModalOpen(true);
+                  }
+                }}
+              >
                 Start Your Learning Journey Free
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>

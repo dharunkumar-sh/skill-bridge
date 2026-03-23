@@ -1,10 +1,13 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Rocket } from "lucide-react";
+import { Menu, X, Rocket, LogOut } from "lucide-react";
 import Button from "./ui/Button";
+import AuthModal from "./AuthModal";
+import { useAuth } from "@/context/AuthContext";
 
 const navLinks = [
   { name: "Courses", href: "#courses" },
@@ -12,8 +15,8 @@ const navLinks = [
   { name: "Jobs", href: "#jobs" },
   { name: "Pricing", href: "#pricing" },
 ];
-
 export default function Navbar() {
+  const { user, logout, isAuthModalOpen, setIsAuthModalOpen, authMode, setAuthMode } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -68,16 +71,47 @@ export default function Navbar() {
               ))}
             </div>
             <div className="flex items-center gap-3">
-              <Link href="#login">
-                <Button variant="outline" size="sm" className="h-9 rounded-lg">
-                  Log In
-                </Button>
-              </Link>
-              <Link href="#courses">
-                <Button size="sm" className="h-9 rounded-lg px-6">
-                  Start Learning
-                </Button>
-              </Link>
+              {user ? (
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    {user.picture ? (
+                      <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full border border-midnight-700" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                        {user.name?.charAt(0) || "U"}
+                      </div>
+                    )}
+                    <span className="text-sm font-medium text-slate-300 hidden lg:block">{user.name}</span>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={logout} 
+                    className="text-red-500! hover:text-red-400! hover:bg-red-500/10! px-2 flex items-center gap-1.5 transition-all hover:translate-x-1"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="hidden lg:inline">Sign Out</span>
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-9 rounded-lg"
+                    onClick={() => { setAuthMode("login"); setIsAuthModalOpen(true); }}
+                  >
+                    Log In
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="h-9 rounded-lg px-6"
+                    onClick={() => { setAuthMode("signup"); setIsAuthModalOpen(true); }}
+                  >
+                    Sign Up
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
@@ -115,21 +149,73 @@ export default function Navbar() {
               ))}
               <div className="h-px bg-white/5 my-2" />
               <div className="flex flex-col gap-4">
-                <Link href="#login" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="ghost" fullWidth className="text-slate-400 hover:text-white">
-                    Log In
-                  </Button>
-                </Link>
-                <Link href="#courses" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="primary" fullWidth>
-                    Start Learning Free
-                  </Button>
-                </Link>
+                {user ? (
+                  <>
+                    <div className="flex items-center gap-3 px-2 py-2 mb-2">
+                      {user.picture ? (
+                        <img src={user.picture} alt={user.name} className="w-10 h-10 rounded-full border border-midnight-700" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                          {user.name?.charAt(0) || "U"}
+                        </div>
+                      )}
+                      <div>
+                        <div className="text-white font-medium">{user.name}</div>
+                        <div className="text-slate-400 text-xs">{user.email}</div>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      fullWidth 
+                      className="text-red-400! hover:text-red-300! hover:bg-red-400/10! flex items-center justify-center gap-2 py-3 mt-2"
+                      onClick={() => {
+                        logout();
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      <LogOut className="w-5 h-5" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      variant="ghost" 
+                      fullWidth 
+                      className="text-slate-400 hover:text-white"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        setAuthMode("login");
+                        setIsAuthModalOpen(true);
+                      }}
+                    >
+                      Log In
+                    </Button>
+                    <Button 
+                      variant="primary" 
+                      fullWidth
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        setAuthMode("signup");
+                        setIsAuthModalOpen(true);
+                      }}
+                    >
+                      Sign Up Free
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        mode={authMode} 
+        onModeChange={setAuthMode}
+      />
     </nav>
   );
 }

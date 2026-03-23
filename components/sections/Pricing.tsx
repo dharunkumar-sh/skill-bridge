@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import Button from "../ui/Button";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const plans = [
   {
@@ -49,6 +51,9 @@ const plans = [
 ];
 
 export default function Pricing() {
+  const { user, setIsAuthModalOpen, setAuthMode } = useAuth();
+  const router = useRouter();
+
   return (
     <section className="py-24 bg-midnight-900 relative" id="pricing">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -108,6 +113,14 @@ export default function Pricing() {
                 fullWidth 
                 size="lg"
                 className={plan.popular ? "" : "bg-midnight-700/30"}
+                onClick={() => {
+                  if (user) {
+                    router.push("/dashboard");
+                  } else {
+                    setAuthMode("signup");
+                    setIsAuthModalOpen(true);
+                  }
+                }}
               >
                 {plan.cta}
               </Button>

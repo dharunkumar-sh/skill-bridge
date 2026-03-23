@@ -3,8 +3,13 @@
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2, Star, Users } from "lucide-react";
 import Button from "../ui/Button";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function Hero() {
+  const { user, setIsAuthModalOpen, setAuthMode } = useAuth();
+  const router = useRouter();
+
   return (
     <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden bg-midnight-900">
       {/* Abstract Background Shapes */}
@@ -38,7 +43,18 @@ export default function Hero() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <Button size="lg" className="group">
+              <Button 
+                size="lg" 
+                className="group"
+                onClick={() => {
+                  if (user) {
+                    router.push("/dashboard");
+                  } else {
+                    setAuthMode("signup");
+                    setIsAuthModalOpen(true);
+                  }
+                }}
+              >
                 Start Learning Free
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>

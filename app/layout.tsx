@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 
 const inter = Inter({
@@ -15,6 +13,9 @@ export const metadata: Metadata = {
   description: "Master in-demand skills. Get matched with jobs. Earn 40-50% more.",
 };
 
+import { AuthProvider } from "@/context/AuthContext";
+import LayoutContent from "@/components/LayoutContent";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,9 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} scroll-smooth`}>
       <body className="min-h-screen flex flex-col font-sans antialiased text-slate-100">
-        <Navbar />
-        <main className="flex-1 flex flex-col">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <LayoutContent>
+            {children}
+          </LayoutContent>
+        </AuthProvider>
       </body>
     </html>
   );
