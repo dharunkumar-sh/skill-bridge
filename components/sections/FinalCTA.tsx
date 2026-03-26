@@ -59,7 +59,7 @@ export default function FinalCTA() {
                   }
                 }}
               >
-                Start Your Learning Journey Free
+                {user ? "Go to Dashboard" : "Start Your Learning Journey Free"}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </motion.div>

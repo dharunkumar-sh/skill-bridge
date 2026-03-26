@@ -1,6 +1,13 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
 
@@ -9,6 +16,12 @@ export interface User {
   name: string;
   email: string;
   picture: string;
+  hasCompletedOnboarding?: boolean;
+  mindset?: string | null;
+  skillStatus?: string | null;
+  careerGoal?: string | null;
+  authProvider?: string;
+  githubUsername?: string | null;
 }
 
 interface AuthContextType {
@@ -23,8 +36,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const clientId =
-  "526605998915-lgt7jkhs6shou56gdlemoo671i7j9if6.apps.googleusercontent.com";
+const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -50,7 +62,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (typeof window !== "undefined") {
       localStorage.setItem("user", JSON.stringify(userData));
     }
-    router.push("/dashboard");
+
+    // Check if onboarding is needed
+    if (!userData.hasCompletedOnboarding) {
+      router.push("/onboarding");
+    } else {
+      router.push("/dashboard");
+    }
   };
 
   const logout = () => {
@@ -61,16 +79,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <GoogleOAuthProvider clientId={clientId}>
-      <AuthContext.Provider value={{ 
-        user, 
-        login, 
-        logout, 
-        isAuthModalOpen, 
-        setIsAuthModalOpen, 
-        authMode, 
-        setAuthMode 
-      }}>
+    <GoogleOAuthProvider clientId={clientId || ""}>
+      <AuthContext.Provider
+        value={{
+          user,
+          login,
+          logout,
+          isAuthModalOpen,
+          setIsAuthModalOpen,
+          authMode,
+          setAuthMode,
+        }}
+      >
         {children}
       </AuthContext.Provider>
     </GoogleOAuthProvider>

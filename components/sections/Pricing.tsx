@@ -15,7 +15,7 @@ const plans = [
       "Access to 50+ basic courses",
       "Community peer support",
       "Basic job listings access",
-      "Self-paced learning"
+      "Self-paced learning",
     ],
     cta: "Start Free",
     popular: false,
@@ -29,7 +29,7 @@ const plans = [
       "1-on-1 mentoring (5 sessions/mo)",
       "Real-world Capstone projects",
       "AI Job Matching Algorithm",
-      "Resume & Portfolio review"
+      "Resume & Portfolio review",
     ],
     cta: "Get Started",
     popular: true,
@@ -43,11 +43,11 @@ const plans = [
       "Unlimited 1-on-1 mentoring",
       "Priority job placement",
       "Salary negotiation support",
-      "Certificate priority processing"
+      "Certificate priority processing",
     ],
     cta: "Upgrade Now",
     popular: false,
-  }
+  },
 ];
 
 export default function Pricing() {
@@ -75,9 +75,9 @@ export default function Pricing() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
               className={`bg-midnight-800 rounded-3xl p-8 relative flex flex-col h-full hover:border-blue-500/50 transition-all ${
-                plan.popular 
-                  ? 'border-2 border-blue-500 shadow-2xl shadow-blue-500/10 md:-translate-y-4' 
-                  : 'border border-midnight-700 shadow-xl'
+                plan.popular
+                  ? "border-2 border-blue-500 shadow-2xl shadow-blue-500/10 md:-translate-y-4"
+                  : "border border-midnight-700 shadow-xl"
               }`}
             >
               {plan.popular && (
@@ -85,22 +85,32 @@ export default function Pricing() {
                   Most Popular
                 </div>
               )}
-              
+
               <div className="mb-8">
-                <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
-                <p className="text-slate-400 text-sm h-10">{plan.description}</p>
+                <h3 className="text-xl font-bold text-white mb-2">
+                  {plan.name}
+                </h3>
+                <p className="text-slate-400 text-sm h-10">
+                  {plan.description}
+                </p>
               </div>
 
               <div className="mb-8 flex items-baseline gap-1">
-                <span className="text-2xl font-bold tracking-tight text-white">₹</span>
-                <span className="text-5xl font-extrabold tracking-tight text-white">{plan.price}</span>
+                <span className="text-2xl font-bold tracking-tight text-white">
+                  ₹
+                </span>
+                <span className="text-5xl font-extrabold tracking-tight text-white">
+                  {plan.price}
+                </span>
                 <span className="text-slate-500 font-medium">/mo</span>
               </div>
 
               <ul className="mb-8 space-y-4 flex-1">
                 {plan.features.map((feature, fIdx) => (
                   <li key={fIdx} className="flex items-start gap-3">
-                    <div className={`mt-0.5 rounded-full p-0.5 ${plan.popular ? 'bg-blue-900/40 text-blue-400' : 'bg-emerald-900/40 text-emerald-400'}`}>
+                    <div
+                      className={`mt-0.5 rounded-full p-0.5 ${plan.popular ? "bg-blue-900/40 text-blue-400" : "bg-emerald-900/40 text-emerald-400"}`}
+                    >
                       <Check size={14} strokeWidth={3} />
                     </div>
                     <span className="text-slate-300">{feature}</span>
@@ -108,9 +118,9 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              <Button 
-                variant={plan.popular ? "primary" : "outline"} 
-                fullWidth 
+              <Button
+                variant={plan.popular ? "primary" : "outline"}
+                fullWidth
                 size="lg"
                 className={plan.popular ? "" : "bg-midnight-700/30"}
                 onClick={() => {
@@ -122,7 +132,7 @@ export default function Pricing() {
                   }
                 }}
               >
-                {plan.cta}
+                {user ? "Go to Dashboard" : plan.cta}
               </Button>
             </motion.div>
           ))}
