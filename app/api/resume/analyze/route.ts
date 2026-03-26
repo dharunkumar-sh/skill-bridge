@@ -1,94 +1,176 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
-// @ts-ignore
-import PDFParser from "pdf2json";
+import { extractText } from "unpdf";
 
+/**
+ * Advanced PDF text extraction using unpdf
+ * unpdf is lightweight and handles various PDF formats better
+ */
+async function extractTextFromPDF(buffer: Buffer): Promise<string> {
+  try {
+    // Convert Buffer to Uint8Array for unpdf
+    const uint8Array = new Uint8Array(buffer);
+
+    // Extract text using unpdf
+    const { text, totalPages } = await extractText(uint8Array, {
+      mergePages: true, // Merge all pages into single text
+    });
+
+    if (!text || text.trim().length === 0) {
+      throw new Error("PDF appears to be empty or contains only images");
+    }
+
+    // Clean and normalize the extracted text
+    const cleanedText = text
+      .replace(/\r\n/g, "\n") // Normalize line endings
+      .replace(/\n{3,}/g, "\n\n") // Remove excessive newlines
+      .replace(/\s{2,}/g, " ") // Remove excessive spaces
+      .replace(/\t/g, " ") // Replace tabs with spaces
+      .trim();
+
+    console.log(`Successfully extracted text from ${totalPages} pages`);
+
+    return cleanedText;
+  } catch (error: any) {
+    console.error("PDF extraction error:", error);
+    throw new Error(`Failed to parse PDF: ${error.message}`);
+  }
+}
+
+/**
+ * Analyze resume using Groq AI with parsed text content only
+ */
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("resume") as File;
 
     if (!file) {
-      return NextResponse.json({ error: "No resume file provided." }, { status: 400 });
+      return NextResponse.json(
+        { error: "No resume file provided." },
+        { status: 400 },
+      );
     }
 
     if (file.type !== "application/pdf") {
-      return NextResponse.json({ error: "Only PDF files are supported." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Only PDF files are supported." },
+        { status: 400 },
+      );
     }
 
     const groqApiKey = process.env.GROQ_API_KEY;
     if (!groqApiKey) {
       return NextResponse.json(
-        { error: "GROQ_API_KEY is not configured on the server. Please add it to your .env.local file." },
-        { status: 500 }
+        { error: "GROQ_API_KEY is not configured on the server." },
+        { status: 500 },
       );
     }
 
-    // Convert Next.js File object to Node.js Buffer
+    // Step 1: Convert File to Buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Provide the parsed content to the AI using advanced parsing package (pdf2json)
-    let parsedText = await new Promise<string>((resolve, reject) => {
-      const pdfParser = new PDFParser(null, 1); // 1 = returns raw text content
-      
-      pdfParser.on("pdfParser_dataError", (errData: any) => reject(errData.parserError));
-      pdfParser.on("pdfParser_dataReady", () => {
-        resolve(pdfParser.getRawTextContent());
-      });
-
-      pdfParser.parseBuffer(buffer);
-    });
-
-    if (!parsedText || parsedText.trim().length === 0) {
-      return NextResponse.json({ error: "The uploaded PDF appears to be empty or contains only images (scanned PDF)." }, { status: 400 });
+    // Step 2: Extract text from PDF using unpdf
+    let parsedText: string;
+    try {
+      parsedText = await extractTextFromPDF(buffer);
+    } catch (parseError: any) {
+      return NextResponse.json(
+        {
+          error:
+            parseError.message ||
+            "Failed to parse PDF content. Please ensure the PDF contains readable text.",
+        },
+        { status: 400 },
+      );
     }
 
-    // Clean up excessive newlines
-    parsedText = parsedText.replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n');
+    // Validate parsed content
+    if (parsedText.length < 50) {
+      return NextResponse.json(
+        {
+          error:
+            "Resume content is too short. Please ensure the PDF contains readable text (not just images).",
+        },
+        { status: 400 },
+      );
+    }
 
-    // Initialize Groq SDK
+    console.log(`Extracted ${parsedText.length} characters from PDF`);
+
+    // Step 3: Truncate to reasonable length for AI processing (max ~6000 chars)
+    const truncatedText = parsedText.substring(0, 6000);
+
+    // Step 4: Initialize Groq SDK
     const groq = new Groq({ apiKey: groqApiKey });
 
-    // Construct the LLM Prompt
-    const prompt = `
-    You are an expert technical recruiter and ATS (Applicant Tracking System) software. 
-    Analyze the following extracted text from a candidate's resume and evaluate it against modern software engineering industry standards.
+    // Step 5: Construct AI prompt for resume analysis
+    const prompt = `You are an expert technical recruiter and ATS (Applicant Tracking System) software. 
+Analyze the following extracted text from a candidate's resume and evaluate it against modern software engineering industry standards.
 
-    Extract the data and respond EXACTLY in the following JSON format. Do NOT wrap it in markdown blockquotes like \`\`\`json. Just return the raw JSON object.
-    {
-      "atsScore": <number between 0-100 based on structure, impact, keywords, and clarity>,
-      "matchedSkills": [<array of string, up to 10 prominent engineering skills found>],
-      "missingSkills": [<array of string, up to 5 critical industry standard skills that are missing based on what they do have>],
-      "improvements": [<array of 3 distinct, highly actionable improvements for their bullet points or formatting>]
-    }
+IMPORTANT: Respond ONLY with a valid JSON object. Do NOT include markdown code blocks, explanations, or any other text.
 
-    Resume Text to analyze:
-    """
-    ${parsedText.substring(0, 5000)} // Truncating to approx 5000 chars to avoid prompt bloat
-    """
-    `;
+Required JSON format:
+{
+  "atsScore": <number between 0-100 based on structure, impact, keywords, and clarity>,
+  "matchedSkills": [<array of strings, up to 10 prominent technical skills found>],
+  "missingSkills": [<array of strings, up to 5 critical industry skills that are missing>],
+  "improvements": [<array of 3 distinct, actionable improvements for bullet points or formatting>]
+}
 
-    // Query Groq Llama3 70B model or mixtral
+Resume Text:
+"""
+${truncatedText}
+"""`;
+
+    // Step 6: Query Groq with latest supported model
     const completion = await groq.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: "llama3-8b-8192", // Fast and capable model
-      temperature: 0.2, // Low temp for more deterministic ATS formatting
+      model: "llama-3.3-70b-versatile", // Latest supported model
+      temperature: 0.2, // Low temperature for consistent, deterministic results
+      max_tokens: 1500,
       response_format: { type: "json_object" },
     });
 
     const responseText = completion.choices[0]?.message?.content || "{}";
-    
-    // Parse the JSON string returned by Groq
-    const analysisResult = JSON.parse(responseText);
+
+    // Step 7: Parse and validate AI response
+    let analysisResult;
+    try {
+      analysisResult = JSON.parse(responseText);
+
+      // Validate required fields
+      if (
+        typeof analysisResult.atsScore !== "number" ||
+        !Array.isArray(analysisResult.matchedSkills)
+      ) {
+        throw new Error("Invalid AI response format");
+      }
+
+      // Ensure all fields exist with defaults
+      analysisResult = {
+        atsScore: Math.min(100, Math.max(0, analysisResult.atsScore || 0)),
+        matchedSkills: analysisResult.matchedSkills || [],
+        missingSkills: analysisResult.missingSkills || [],
+        improvements: analysisResult.improvements || [],
+      };
+    } catch (parseError) {
+      console.error("Failed to parse AI response:", responseText);
+      return NextResponse.json(
+        { error: "Failed to parse AI analysis results. Please try again." },
+        { status: 500 },
+      );
+    }
 
     return NextResponse.json(analysisResult);
-
   } catch (error: any) {
     console.error("Resume Analysis API Error:", error);
     return NextResponse.json(
-      { error: error.message || "An unexpected error occurred during AI analysis." },
-      { status: 500 }
+      {
+        error: error.message || "An unexpected error occurred during analysis.",
+      },
+      { status: 500 },
     );
   }
 }
