@@ -31,6 +31,13 @@ export interface User {
   authProvider?: string;
   githubUsername?: string | null;
   aiAnalysis?: any;
+  // Subscription fields
+  subscriptionPlan?: string; // free, professional, premium
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
+  subscriptionStatus?: string; // active, inactive, canceled, past_due
+  subscriptionStartDate?: string | null;
+  subscriptionEndDate?: string | null;
 }
 
 interface AuthContextType {
@@ -94,7 +101,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!currentEmail) return;
 
     try {
-      const res = await fetch(`/api/user/profile?email=${encodeURIComponent(currentEmail)}`);
+      const res = await fetch(
+        `/api/user/profile?email=${encodeURIComponent(currentEmail)}`,
+      );
       if (res.ok) {
         const data = await res.json();
         if (data.user) {

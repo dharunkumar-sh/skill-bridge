@@ -79,6 +79,11 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+              {user?.subscriptionPlan && user?.subscriptionStatus === "active" && (
+                <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider rounded-full border border-emerald-500/30 flex items-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                  {user.subscriptionPlan === "premium" ? "👑 Premium Plan" : "✨ Pro Member"}
+                </span>
+              )}
               <span className="px-3 py-1 bg-blue-900/30 text-blue-400 text-xs font-semibold rounded-full border border-blue-800/30">
                 {user?.authProvider === "google"
                   ? "Google Account"
@@ -87,7 +92,7 @@ export default function ProfilePage() {
                     : "Email Account"}
               </span>
               {user?.githubUsername && (
-                <span className="px-3 py-1 bg-emerald-900/30 text-emerald-400 text-xs font-semibold rounded-full border border-emerald-800/30">
+                <span className="px-3 py-1 bg-slate-800/50 text-slate-300 text-xs font-semibold rounded-full border border-slate-700">
                   @{user.githubUsername}
                 </span>
               )}

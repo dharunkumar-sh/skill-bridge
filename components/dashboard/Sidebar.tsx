@@ -12,6 +12,9 @@ import {
   Rocket,
   FileText,
 } from "lucide-react";
+import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import CheckoutModal from "../CheckoutModal";
 
 export const SIDEBAR_ITEMS = [
   { name: "Overview", href: "/dashboard", icon: Home },
@@ -29,6 +32,29 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<"professional" | "premium">(
+    "professional",
+  );
+
+  const handleUpgradeClick = () => {
+    setSelectedPlan("professional");
+    setShowCheckoutModal(true);
+  };
+
+  const planDetails = {
+    professional: {
+      name: "Professional",
+      price: "2,999",
+      currency: "₹",
+    },
+    premium: {
+      name: "Premium",
+      price: "4,999",
+      currency: "₹",
+    },
+  };
 
   return (
     <>
@@ -102,21 +128,57 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             })}
           </nav>
 
-          {/* Upgrade Card */}
-          <div className="p-4 border-t border-white/5">
-            <div className="bg-linear-to-br from-midnight-800 to-midnight-900 border border-midnight-700 p-4 rounded-xl text-center shadow-lg relative overflow-hidden group">
-              <div className="absolute inset-0 bg-linear-to-r from-blue-600/10 to-transparent -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
-              <h4 className="text-white text-sm font-bold mb-1">Unlock Pro</h4>
-              <p className="text-slate-400 text-xs mb-3">
-                Get 1-on-1 expert mentorship.
-              </p>
-              <button className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors shadow-md cursor-pointer">
-                Upgrade Now
-              </button>
+          {/* Upgrade Card / Active Plan Card */}
+          {user && (
+            <div className="p-4 border-t border-white/5 mt-auto">
+              {user.subscriptionPlan === "professional" || user.subscriptionPlan === "premium" ? (
+                <div className="bg-linear-to-br from-emerald-900/20 to-midnight-900 border border-emerald-500/20 p-4 rounded-xl text-center shadow-lg relative overflow-hidden group">
+                  <div className="absolute inset-0 pointer-events-none bg-linear-to-r from-emerald-500/5 to-transparent -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
+                  <h4 className="text-white text-sm font-bold mb-1 capitalize flex justify-center items-center gap-1.5">
+                    {user.subscriptionPlan === "premium" ? "👑 Premium Plan" : "✨ Pro Member"}
+                  </h4>
+                  <p className="text-emerald-400/80 text-[11px] mb-0 font-medium uppercase tracking-wider">
+                    {user.subscriptionStatus === "active" ? "Active Subscription" : "Status: " + user.subscriptionStatus}
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-linear-to-br from-midnight-800 to-midnight-900 border border-midnight-700 p-4 rounded-xl text-center shadow-lg relative overflow-hidden group">
+                  <div className="absolute inset-0 pointer-events-none bg-linear-to-r from-blue-600/10 to-transparent -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
+                  <h4 className="text-white text-sm font-bold mb-1">
+                    Unlock Pro
+                  </h4>
+                  <p className="text-slate-400 text-xs mb-3">
+                    Get 1-on-1 expert mentorship.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleUpgradeClick}
+                    className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors shadow-md cursor-pointer"
+                  >
+                    Upgrade Now
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
+          )}
         </div>
       </aside>
+
+      {/* Checkout Modal (rendered outside transformed sidebar) */}
+      {user && (
+        <CheckoutModal
+          isOpen={showCheckoutModal}
+          onClose={() => setShowCheckoutModal(false)}
+          userEmail={user.email}
+          userId={user.id || ""}
+          plan={selectedPlan}
+          planDetails={planDetails[selectedPlan]}
+          onSuccess={() => {
+            // Refresh the page or update user context
+            window.location.reload();
+          }}
+        />
+      )}
     </>
   );
 }
