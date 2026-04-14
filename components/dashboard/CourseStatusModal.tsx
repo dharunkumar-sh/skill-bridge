@@ -13,7 +13,7 @@ import {
 import Button from "../ui/Button";
 import axios from "axios";
 
-interface OverdueCourse {
+export interface OverdueCourse {
   id: string;
   courseTitle: string;
   courseUrl?: string;

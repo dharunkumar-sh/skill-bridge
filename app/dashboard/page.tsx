@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import { CheckCircle2, TrendingUp, Zap, Target, BookOpen, Clock, Lightbulb, AlertTriangle, Compass, Loader2, Award, Briefcase, ChevronRight } from "lucide-react";
-import CourseStatusModal from "@/components/dashboard/CourseStatusModal";
+import CourseStatusModal, { OverdueCourse } from "@/components/dashboard/CourseStatusModal";
 
 interface SkillGap {
   skill: string;
@@ -129,7 +129,7 @@ export default function OverviewPage() {
   const { user, refreshUser } = useAuth();
   const [aiData, setAiData] = useState<AIData | null>(null);
   const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourse[]>([]);
-  const [overdueCourses, setOverdueCourses] = useState<EnrolledCourse[]>([]);
+  const [overdueCourses, setOverdueCourses] = useState<OverdueCourse[]>([]);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [updateCourse, setUpdateCourse] = useState<EnrolledCourse | null>(null);
   const [loading, setLoading] = useState(true);
