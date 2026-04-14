@@ -172,7 +172,7 @@ export default function Hero() {
                   Hired this week
                 </p>
                 <p className="text-xl font-bold text-white">432 Students</p>
-              </div>
+              </div>  
             </motion.div>
           </motion.div>
         </div>

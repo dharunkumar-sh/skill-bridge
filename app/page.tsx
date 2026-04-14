@@ -3,7 +3,6 @@ import ProblemStatement from "@/components/sections/ProblemStatement";
 import HowItWorks from "@/components/sections/HowItWorks";
 import KeyFeatures from "@/components/sections/KeyFeatures";
 import Statistics from "@/components/sections/Statistics";
-import Testimonials from "@/components/sections/Testimonials";
 import SkillCategories from "@/components/sections/SkillCategories";
 import Pricing from "@/components/sections/Pricing";
 import FAQ from "@/components/sections/FAQ";
@@ -17,7 +16,6 @@ export default function Home() {
       <HowItWorks />
       <KeyFeatures />
       <Statistics />
-      <Testimonials />
       <SkillCategories />
       <Pricing />
       <FAQ />
