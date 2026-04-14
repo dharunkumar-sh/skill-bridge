@@ -93,7 +93,7 @@ function UpdateProgressModal({ course, onClose, onSave }: { course: EnrolledCour
   };
 
   return (
-    <div className="fixed inset-0 z-[200] bg-midnight-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-200 bg-midnight-950/80 backdrop-blur-md flex items-center justify-center p-4">
       <div className="bg-midnight-900 border border-white/10 w-full max-w-sm rounded-3xl p-6 shadow-2xl relative">
         <h3 className="text-lg font-bold text-white mb-2">Update Progress</h3>
         <p className="text-xs text-slate-400 mb-6 truncate">{course.courseTitle}</p>
@@ -315,7 +315,7 @@ export default function OverviewPage() {
       </div>
 
       {/* ── Internship / Job Prompt for High Match ── */}
-      {aiData?.readinessScore >= 75 && (
+      {aiData != null && aiData.readinessScore >= 75 && (
         <div className="bg-linear-to-r from-emerald-900/40 to-emerald-950/40 border border-emerald-500/20 rounded-3xl p-6 md:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl w-full">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-500/20 shrink-0">
@@ -323,10 +323,10 @@ export default function OverviewPage() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
-                You're ready for the big leagues!
+                You&apos;re ready for the big leagues!
               </h2>
               <p className="text-sm text-slate-300">
-                With a role match of <strong>{aiData.readinessScore}%</strong>, you've reached the top tier of candidates. Start applying for internships and jobs now.
+                With a role match of <strong>{aiData!.readinessScore}%</strong>, you&apos;ve reached the top tier of candidates. Start applying for internships and jobs now.
               </p>
             </div>
           </div>
@@ -453,15 +453,15 @@ export default function OverviewPage() {
             {totalWeekly > 0 ? (
               <>
                 <div className="w-full h-8 flex rounded-xl overflow-hidden mb-5">
-                  <div className="bg-blue-500 hover:opacity-90 transition-opacity" style={{ width: `${(aiData.weeklyPlan.theory / totalWeekly) * 100}%` }} />
-                  <div className="bg-emerald-500 hover:opacity-90 transition-opacity border-l border-r border-midnight-900" style={{ width: `${(aiData.weeklyPlan.practice / totalWeekly) * 100}%` }} />
-                  <div className="bg-amber-500 hover:opacity-90 transition-opacity" style={{ width: `${(aiData.weeklyPlan.projects / totalWeekly) * 100}%` }} />
+                  <div className="bg-blue-500 hover:opacity-90 transition-opacity" style={{ width: `${(aiData!.weeklyPlan.theory / totalWeekly) * 100}%` }} />
+                  <div className="bg-emerald-500 hover:opacity-90 transition-opacity border-l border-r border-midnight-900" style={{ width: `${(aiData!.weeklyPlan.practice / totalWeekly) * 100}%` }} />
+                  <div className="bg-amber-500 hover:opacity-90 transition-opacity" style={{ width: `${(aiData!.weeklyPlan.projects / totalWeekly) * 100}%` }} />
                 </div>
                 <div className="grid grid-cols-1 gap-3 mt-auto">
                   {[
-                    { label: "Theory & Video", color: "bg-blue-500", hours: aiData.weeklyPlan.theory },
-                    { label: "Hands-on Practice", color: "bg-emerald-500", hours: aiData.weeklyPlan.practice },
-                    { label: "Real Projects", color: "bg-amber-500", hours: aiData.weeklyPlan.projects },
+                    { label: "Theory & Video", color: "bg-blue-500", hours: aiData!.weeklyPlan.theory },
+                    { label: "Hands-on Practice", color: "bg-emerald-500", hours: aiData!.weeklyPlan.practice },
+                    { label: "Real Projects", color: "bg-amber-500", hours: aiData!.weeklyPlan.projects },
                   ].map((item, i) => (
                     <div key={i} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2 text-slate-300"><span className={`w-3 h-3 rounded ${item.color}`} /> {item.label}</div>
