@@ -8,10 +8,22 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import CheckoutModal from "@/components/CheckoutModal";
 
-const plans = [
+type PaidPlanKey = "professional" | "premium";
+
+type Plan = {
+  name: string;
+  price: string;
+  planKey: PaidPlanKey | null;
+  description: string;
+  features: string[];
+  cta: string;
+  popular: boolean;
+};
+
+const plans: Plan[] = [
   {
     name: "Starter",
-    price: "999",
+    price: "0",
     planKey: null, // free tier — no checkout
     description: "Perfect for exploring new career paths.",
     features: [
@@ -25,7 +37,7 @@ const plans = [
   },
   {
     name: "Professional",
-    price: "2,999",
+    price: "1,999",
     planKey: "professional" as const,
     description: "For serious learners looking for jobs.",
     features: [
@@ -40,7 +52,7 @@ const plans = [
   },
   {
     name: "Premium",
-    price: "4,999",
+    price: "3,999",
     planKey: "premium" as const,
     description: "The ultimate track with guarantees.",
     features: [
@@ -59,11 +71,15 @@ export default function Pricing() {
   const { user, setIsAuthModalOpen, setAuthMode, refreshUser } = useAuth();
   const router = useRouter();
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<"professional" | "premium">("professional");
+  const [selectedPlan, setSelectedPlan] = useState<PaidPlanKey>("professional");
 
   const currentPlan = user?.subscriptionPlan || "free";
+  const freePlan = plans.find((plan) => plan.planKey === null);
+  const paidPlans = plans.filter(
+    (plan): plan is Plan & { planKey: PaidPlanKey } => plan.planKey !== null,
+  );
 
-  const handlePlanClick = (plan: typeof plans[0]) => {
+  const handlePlanClick = (plan: Plan) => {
     if (!user) {
       // Not logged in — open sign up
       setAuthMode("signup");
@@ -88,7 +104,7 @@ export default function Pricing() {
     setShowCheckoutModal(true);
   };
 
-  const getPlanCta = (plan: typeof plans[0]) => {
+  const getPlanCta = (plan: Plan) => {
     if (!user) return plan.cta;
     if (!plan.planKey) return "Go to Dashboard";
     if (currentPlan === plan.planKey) return "Current Plan ✓";
@@ -108,8 +124,67 @@ export default function Pricing() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-center">
-            {plans.map((plan, idx) => {
+          {freePlan && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="max-w-4xl mx-auto mb-10 bg-midnight-800 rounded-3xl p-8 border border-emerald-500/40 shadow-xl"
+            >
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <div>
+                  <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-900/40 text-emerald-300 border border-emerald-500/30 mb-4">
+                    Free Plan
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    {freePlan.name}
+                  </h3>
+                  <p className="text-slate-400 text-sm">
+                    {freePlan.description}
+                  </p>
+                </div>
+
+                <div className="text-left md:text-right">
+                  <div className="mb-2">
+                    <span className="text-4xl font-extrabold tracking-tight text-white">
+                      Free
+                    </span>
+                  </div>
+                  <p className="text-emerald-300 text-sm font-medium">
+                    No payment method required
+                  </p>
+                </div>
+              </div>
+
+              <ul className="mt-8 grid sm:grid-cols-2 gap-4">
+                {freePlan.features.map((feature, fIdx) => (
+                  <li key={fIdx} className="flex items-start gap-3">
+                    <div className="mt-0.5 rounded-full p-0.5 bg-emerald-900/40 text-emerald-400">
+                      <Check size={14} strokeWidth={3} />
+                    </div>
+                    <span className="text-slate-300">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-8 md:max-w-xs">
+                <Button
+                  variant="outline"
+                  fullWidth
+                  size="lg"
+                  className="bg-midnight-700/30"
+                  disabled={user ? currentPlan === "free" : false}
+                  onClick={() => handlePlanClick(freePlan)}
+                >
+                  {getPlanCta(freePlan)}
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto items-stretch">
+            {paidPlans.map((plan, idx) => {
               const isCurrentPlan = user && currentPlan === plan.planKey;
 
               return (
@@ -147,7 +222,9 @@ export default function Pricing() {
                   </div>
 
                   <div className="mb-8 flex items-baseline gap-1">
-                    <span className="text-2xl font-bold tracking-tight text-white">₹</span>
+                    <span className="text-2xl font-bold tracking-tight text-white">
+                      ₹
+                    </span>
                     <span className="text-5xl font-extrabold tracking-tight text-white">
                       {plan.price}
                     </span>
@@ -199,8 +276,12 @@ export default function Pricing() {
           plan={selectedPlan}
           planDetails={
             {
-              professional: { name: "Professional", price: "2,999", currency: "₹" },
-              premium: { name: "Premium", price: "4,999", currency: "₹" },
+              professional: {
+                name: "Professional",
+                price: "1,999",
+                currency: "₹",
+              },
+              premium: { name: "Premium", price: "3,999", currency: "₹" },
             }[selectedPlan]
           }
           onSuccess={() => {

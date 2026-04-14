@@ -10,6 +10,14 @@ interface Stats {
   avgSalaryIncrease: number;
 }
 
+type FormattedStat = {
+  value: number;
+  suffix: string;
+  label: string;
+  isFloat?: boolean;
+  prefix?: string;
+} & Stats;
+
 interface CounterProps {
   from?: number;
   to: number;
@@ -64,15 +72,7 @@ function Counter({
 }
 
 export default function Statistics() {
-  const [stats, setStats] = useState<
-    | (Stats & {
-        suffix: string;
-        label: string;
-        isFloat?: boolean;
-        prefix?: string;
-      })[]
-    | null
-  >(null);
+  const [stats, setStats] = useState<FormattedStat[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
