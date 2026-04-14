@@ -20,9 +20,8 @@ export default function Hero() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-          
           {/* Left Content */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
@@ -32,19 +31,22 @@ export default function Hero() {
               <Star size={16} className="fill-blue-400" />
               <span>Rated #1 Career Platform 2024</span>
             </div>
-            
+
             <h1 className="text-4xl md:text-5xl lg:text-h1 font-bold tracking-tight text-white leading-tight mb-6">
-              Bridge Your Skills to Your <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-400">Dream Job</span>
+              Bridge Your Skills to Your{" "}
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-400">
+                Dream Job
+              </span>
             </h1>
-            
+
             <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-xl">
-              Master in-demand skills. Get matched with jobs. Earn 40-50% more. 
+              Master in-demand skills. Get matched with jobs. Earn 40-50% more.
               Join India&apos;s fastest-growing skill-to-employment platform.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="group"
                 onClick={() => {
                   if (user) {
@@ -59,7 +61,6 @@ export default function Hero() {
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
-
           </motion.div>
 
           {/* Right Visual (Abstract UI representation) */}
@@ -67,7 +68,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative lg:h-[600px] flex items-center justify-center"
+            className="relative lg:h-150 flex items-center justify-center"
           >
             {/* Main dashboard mock */}
             <div className="relative z-10 w-full max-w-lg bg-midnight-800 rounded-2xl shadow-2xl shadow-black/50 border border-midnight-700 overflow-hidden">
@@ -79,29 +80,61 @@ export default function Hero() {
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
                   <div>
-                    <h3 className="font-semibold text-white text-lg">Your Learning Path</h3>
-                    <p className="text-sm text-slate-400">Data Analytics to Data Scientist</p>
+                    <h3 className="font-semibold text-white text-lg">
+                      Your Learning Path
+                    </h3>
+                    <p className="text-sm text-slate-400">
+                      Data Analytics to Data Scientist
+                    </p>
                   </div>
                   <div className="w-12 h-12 rounded-full bg-blue-900/50 flex items-center justify-center text-blue-400 font-bold border border-blue-800/50">
                     68%
                   </div>
                 </div>
-                
+
                 <div className="space-y-4 mb-6">
                   {[
-                    { title: "Python for Data Analysis", status: "Completed", icon: <CheckCircle2 size={18} className="text-emerald-400" /> },
-                    { title: "Machine Learning Basics", status: "In Progress", icon: <div className="w-2 h-2 rounded-full bg-blue-400 mx-1"></div> },
-                    { title: "Deep Learning with PyTorch", status: "Locked", icon: <div className="w-2 h-2 rounded-full bg-slate-600 mx-1"></div> }
+                    {
+                      title: "Python for Data Analysis",
+                      status: "Completed",
+                      icon: (
+                        <CheckCircle2 size={18} className="text-emerald-400" />
+                      ),
+                    },
+                    {
+                      title: "Machine Learning Basics",
+                      status: "In Progress",
+                      icon: (
+                        <div className="w-2 h-2 rounded-full bg-blue-400 mx-1"></div>
+                      ),
+                    },
+                    {
+                      title: "Deep Learning with PyTorch",
+                      status: "Locked",
+                      icon: (
+                        <div className="w-2 h-2 rounded-full bg-slate-600 mx-1"></div>
+                      ),
+                    },
                   ].map((course, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 rounded-lg border border-midnight-700/50 hover:bg-midnight-700/30 transition-colors">
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-3 rounded-lg border border-midnight-700/50 hover:bg-midnight-700/30 transition-colors"
+                    >
                       <div className="flex items-center gap-3">
                         {course.icon}
-                        <span className="font-medium text-slate-200 text-sm">{course.title}</span>
+                        <span className="font-medium text-slate-200 text-sm">
+                          {course.title}
+                        </span>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        course.status === 'Completed' ? 'bg-emerald-900/30 text-emerald-400 border border-emerald-800/30' : 
-                        course.status === 'In Progress' ? 'bg-blue-900/30 text-blue-400 border border-blue-800/30' : 'bg-midnight-700/50 text-slate-500'
-                      }`}>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full ${
+                          course.status === "Completed"
+                            ? "bg-emerald-900/30 text-emerald-400 border border-emerald-800/30"
+                            : course.status === "In Progress"
+                              ? "bg-blue-900/30 text-blue-400 border border-blue-800/30"
+                              : "bg-midnight-700/50 text-slate-500"
+                        }`}
+                      >
                         {course.status}
                       </span>
                     </div>
@@ -111,15 +144,22 @@ export default function Hero() {
                 <div className="bg-linear-to-r from-blue-400 to-indigo-400 rounded-xl p-5 text-white flex items-center justify-between">
                   <div>
                     <h4 className="font-bold mb-1">New Job Match!</h4>
-                    <p className="text-blue-100 text-sm">Data Analyst at TechCorp</p>
+                    <p className="text-blue-100 text-sm">
+                      Data Analyst at TechCorp
+                    </p>
                   </div>
-                  <Button size="sm" className="bg-white text-blue-600 hover:bg-blue-50">Apply</Button>
+                  <Button
+                    size="sm"
+                    className="bg-white text-blue-600 hover:bg-blue-50"
+                  >
+                    Apply
+                  </Button>
                 </div>
               </div>
             </div>
 
             {/* Floating elements */}
-            <motion.div 
+            <motion.div
               animate={{ y: [0, -15, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
               className="absolute -right-6 top-20 bg-midnight-800 p-4 rounded-xl shadow-2xl border border-midnight-700 z-20 flex items-center gap-4"
@@ -128,11 +168,12 @@ export default function Hero() {
                 <Users size={24} />
               </div>
               <div>
-                <p className="text-sm text-slate-500 font-medium">Hired this week</p>
+                <p className="text-sm text-slate-500 font-medium">
+                  Hired this week
+                </p>
                 <p className="text-xl font-bold text-white">432 Students</p>
               </div>
             </motion.div>
-
           </motion.div>
         </div>
       </div>

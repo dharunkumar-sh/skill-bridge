@@ -42,3 +42,22 @@ export const userCourses = pgTable("user_courses", {
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const mentorshipSessions = pgTable("mentorship_sessions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  mentorName: text("mentor_name").notNull(),
+  mentorRole: text("mentor_role").notNull(),
+  mentorAvatar: text("mentor_avatar").notNull(),
+  topic: text("topic").notNull(),
+  startedAt: timestamp("started_at").defaultNow().notNull(),
+  lastActiveAt: timestamp("last_active_at").defaultNow().notNull(),
+});
+
+export const mentorshipMessages = pgTable("mentorship_messages", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  sessionId: uuid("session_id").notNull().references(() => mentorshipSessions.id),
+  sender: text("sender").notNull(), // 'user' or 'ai'
+  content: text("content").notNull(),
+  sentAt: timestamp("sent_at").defaultNow().notNull(),
+});

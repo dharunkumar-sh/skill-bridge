@@ -614,7 +614,7 @@ export default function OnboardingForm() {
 
   if (isSubmitting) {
     return (
-      <div className="w-full max-w-2xl mx-auto p-8 md:p-12 bg-midnight-900 border border-white/10 rounded-3xl shadow-2xl relative overflow-hidden flex flex-col items-center justify-center min-h-[480px]">
+      <div className="w-full max-w-2xl mx-auto p-8 md:p-12 bg-midnight-900 border border-white/10 rounded-3xl shadow-2xl relative overflow-hidden flex flex-col items-center justify-center min-h-120">
         {/* Background glows */}
         <div className="absolute -top-32 -right-32 w-80 h-80 bg-indigo-500/15 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-blue-500/15 rounded-full blur-[120px] pointer-events-none" />
@@ -622,11 +622,11 @@ export default function OnboardingForm() {
         <div className="relative z-10 flex flex-col items-center text-center">
           {/* Animated brain icon */}
           <div className="ai-loading-pulse mb-8 relative">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center border border-indigo-500/30">
+            <div className="w-24 h-24 rounded-full bg-linear-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center border border-indigo-500/30">
               <Brain className="w-10 h-10 text-indigo-400" />
             </div>
             {/* Spinning ring */}
-            <div className="absolute inset-[-8px] rounded-full border-2 border-transparent border-t-indigo-400/60 ai-loading-spin" />
+            <div className="absolute -inset-2 rounded-full border-2 border-transparent border-t-indigo-400/60 ai-loading-spin" />
           </div>
 
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
@@ -680,7 +680,7 @@ export default function OnboardingForm() {
           {/* Bar */}
           <div className="w-full h-2 rounded-full bg-midnight-800 overflow-hidden">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
+              className="h-full rounded-full bg-linear-to-r from-blue-500 to-indigo-500"
               initial={false}
               animate={{
                 width: `${((currentStep + 1) / steps.length) * 100}%`,
@@ -712,7 +712,7 @@ export default function OnboardingForm() {
 
             {/* ─ SINGLE SELECT ─ */}
             {currentStepData.type === "single-select" && (
-              <div className="space-y-3 max-h-[380px] overflow-y-auto onboarding-scroll pr-1">
+              <div className="space-y-3 max-h-95 overflow-y-auto onboarding-scroll pr-1">
                 {(currentStepData as SingleSelectStep).options.map((option) => {
                   const isSelected = answers[currentStepData.id] === option.id;
                   return (
@@ -775,7 +775,7 @@ export default function OnboardingForm() {
                     </button>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-2.5 max-h-[340px] overflow-y-auto onboarding-scroll pr-1">
+                <div className="flex flex-wrap gap-2.5 max-h-85 overflow-y-auto onboarding-scroll pr-1">
                   {(currentStepData as MultiSelectStep).options.map((tech) => {
                     const isSelected = (
                       answers[currentStepData.id] || []
@@ -814,7 +814,7 @@ export default function OnboardingForm() {
                   <div className="pt-4 pb-8">
                     <div className="text-center mb-10">
                       <span
-                        className={`text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400`}
+                        className={`text-7xl font-bold bg-clip-text text-transparent bg-linear-to-r from-blue-400 to-indigo-400`}
                       >
                         {value}
                       </span>
@@ -976,7 +976,7 @@ export default function OnboardingForm() {
           <Button
             onClick={handleNext}
             disabled={!isStepValid()}
-            className="min-w-[140px]"
+            className="min-w-35"
           >
             {currentStep === steps.length - 1 ? (
               <>
