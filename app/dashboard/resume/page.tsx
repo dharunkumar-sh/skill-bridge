@@ -5,7 +5,7 @@ import { UploadCloud, FileText, CheckCircle2, AlertCircle, RefreshCw, XCircle } 
 import Button from "@/components/ui/Button";
 
 interface AnalysisResult {
-  atsScore: parseInt | number;
+  atsScore: number;
   matchedSkills: string[];
   missingSkills: string[];
   improvements: string[];

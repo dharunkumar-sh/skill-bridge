@@ -91,6 +91,7 @@ export default function Navbar() {
                       <img
                         src={user.picture}
                         alt={user.name}
+                        referrerPolicy="no-referrer"
                         className="w-8 h-8 rounded-full border border-midnight-700"
                       />
                     ) : (
@@ -142,7 +143,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-slate-300 hover:text-white transition-colors p-2"
+            className="md:hidden text-slate-300 hover:text-white transition-colors p-2 cursor-pointer"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -181,6 +182,7 @@ export default function Navbar() {
                         <img
                           src={user.picture}
                           alt={user.name}
+                          referrerPolicy="no-referrer"
                           className="w-10 h-10 rounded-full border border-midnight-700"
                         />
                       ) : (

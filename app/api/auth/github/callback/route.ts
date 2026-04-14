@@ -6,10 +6,11 @@ import { users } from "@/src/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
+  const { searchParams, origin } = new URL(req.url);
   const code = searchParams.get("code");
 
   if (!code) {
+    console.error("No code provided in GitHub callback");
     return NextResponse.json({ error: "No code provided" }, { status: 400 });
   }
 
@@ -17,6 +18,7 @@ export async function GET(req: Request) {
   const clientSecret = process.env.GITHUB_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
+    console.error("GitHub credentials missing in env");
     return NextResponse.json(
       { error: "GitHub credentials not configured on backend" },
       { status: 500 },
@@ -24,6 +26,8 @@ export async function GET(req: Request) {
   }
 
   try {
+    const redirectUri = `${origin}/api/auth/github/callback`;
+
     const tokenRes = await fetch(
       "https://github.com/login/oauth/access_token",
       {
@@ -36,11 +40,18 @@ export async function GET(req: Request) {
           client_id: clientId,
           client_secret: clientSecret,
           code,
+          redirect_uri: redirectUri,
         }),
       },
     );
 
     const tokenData = await tokenRes.json();
+    
+    if (tokenData.error) {
+      console.error("GitHub token error:", tokenData.error, tokenData.error_description);
+      throw new Error(`GitHub token error: ${tokenData.error}`);
+    }
+
     const accessToken = tokenData.access_token;
 
     if (!accessToken) {
@@ -50,6 +61,11 @@ export async function GET(req: Request) {
     const userRes = await fetch("https://api.github.com/user", {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
+    
+    if (!userRes.ok) {
+        throw new Error(`Failed to fetch GitHub user: ${userRes.statusText}`);
+    }
+    
     const githubUser = await userRes.json();
 
     let email = githubUser.email;
@@ -57,13 +73,18 @@ export async function GET(req: Request) {
       const emailRes = await fetch("https://api.github.com/user/emails", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      const emails = await emailRes.json();
-      const primaryEmail = emails.find((e: any) => e.primary);
-      email = primaryEmail?.email;
+      
+      if (emailRes.ok) {
+        const emails = await emailRes.json();
+        if (Array.isArray(emails)) {
+            const primaryEmail = emails.find((e: any) => e.primary);
+            email = primaryEmail?.email;
+        }
+      }
     }
 
     if (!email) {
-      throw new Error("No email found for GitHub user");
+      throw new Error("No public email found for GitHub user. Please make your email public in GitHub settings.");
     }
 
     const name = githubUser.name || githubUser.login;
@@ -78,19 +99,21 @@ export async function GET(req: Request) {
       userRecord = existingUsers[0];
       const githubPicture = githubUser.avatar_url;
       const githubUsername = githubUser.login;
+      
+      // Update user info if it changed
       if (
         (githubPicture && userRecord.picture !== githubPicture) ||
         (githubUsername && userRecord.githubUsername !== githubUsername)
       ) {
-        await db
+        const updated = await db
           .update(users)
           .set({
             picture: githubPicture,
             githubUsername: githubUsername,
           })
-          .where(eq(users.id, userRecord.id));
-        userRecord.picture = githubPicture;
-        userRecord.githubUsername = githubUsername;
+          .where(eq(users.id, userRecord.id))
+          .returning();
+        userRecord = updated[0];
       }
     } else {
       const newUser = await db
@@ -108,12 +131,24 @@ export async function GET(req: Request) {
 
     const { passwordHash: _, ...userWithoutPassword } = userRecord;
 
+    // Determine redirect based on onboarding status
+    const redirectPath = userWithoutPassword.hasCompletedOnboarding
+      ? "/dashboard"
+      : "/onboarding";
+
+    const redirectUrl = `${origin}${redirectPath}`;
+
     const html = `
       <html>
         <body>
           <script>
-            window.localStorage.setItem('user', JSON.stringify(${JSON.stringify(userWithoutPassword)}));
-            window.location.href = '/dashboard';
+            try {
+              localStorage.setItem('user', JSON.stringify(${JSON.stringify(userWithoutPassword)}));
+              window.location.href = '${redirectUrl}';
+            } catch (e) {
+              console.error('Error saving user to localStorage:', e);
+              window.location.href = '/?error=local_storage_failed';
+            }
           </script>
         </body>
       </html>
@@ -122,10 +157,10 @@ export async function GET(req: Request) {
     return new NextResponse(html, {
       headers: { "Content-Type": "text/html" },
     });
-  } catch (error) {
-    console.error("GitHub Auth Error:", error);
+  } catch (error: any) {
+    console.error("GitHub Auth Error:", error.message || error);
     return NextResponse.redirect(
-      new URL("/?error=github_auth_failed", req.url),
+      new URL(`/?error=github_auth_failed&message=${encodeURIComponent(error.message || 'unknown')}`, req.url),
     );
   }
 }

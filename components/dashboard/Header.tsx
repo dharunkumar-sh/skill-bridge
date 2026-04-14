@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { Bell, Search, Menu, LogOut, Settings, User } from "lucide-react";
@@ -47,7 +48,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
       <div className="flex items-center gap-4 flex-1">
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-midnight-800 rounded-lg transition-colors"
+          className="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-midnight-800 rounded-lg transition-colors cursor-pointer"
         >
           <Menu size={24} />
         </button>
@@ -64,7 +65,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
       {/* Right side: Notifications & Profile */}
       <div className="flex items-center gap-4 sm:gap-6">
-        <button className="relative p-2 text-slate-400 hover:text-white transition-colors">
+        <button className="relative p-2 text-slate-400 hover:text-white transition-colors cursor-pointer">
           <Bell size={20} />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-midnight-950"></span>
         </button>
@@ -75,7 +76,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
             >
               <div className="text-right hidden sm:block">
                 <div className="text-sm font-semibold text-white leading-tight">
@@ -87,6 +88,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 <img
                   src={user.picture}
                   alt={user.name}
+                  referrerPolicy="no-referrer"
                   className="w-10 h-10 rounded-full border-2 border-blue-500/20 shadow-md object-cover"
                 />
               ) : (
@@ -116,7 +118,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                       setIsDropdownOpen(false);
                       router.push("/dashboard/profile");
                     }}
-                    className="w-full px-4 py-2.5 text-left text-sm text-slate-300 hover:bg-midnight-800 hover:text-white transition-colors flex items-center gap-3"
+                    className="w-full px-4 py-2.5 text-left text-sm text-slate-300 hover:bg-midnight-800 hover:text-white transition-colors flex items-center gap-3 cursor-pointer"
                   >
                     <User size={16} />
                     <span>My Profile</span>
@@ -127,7 +129,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                       setIsDropdownOpen(false);
                       router.push("/dashboard/settings");
                     }}
-                    className="w-full px-4 py-2.5 text-left text-sm text-slate-300 hover:bg-midnight-800 hover:text-white transition-colors flex items-center gap-3"
+                    className="w-full px-4 py-2.5 text-left text-sm text-slate-300 hover:bg-midnight-800 hover:text-white transition-colors flex items-center gap-3 cursor-pointer"
                   >
                     <Settings size={16} />
                     <span>Settings</span>
@@ -138,7 +140,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 <div className="border-t border-white/5 py-2">
                   <button
                     onClick={handleLogout}
-                    className="w-full px-4 py-2.5 text-left text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors flex items-center gap-3"
+                    className="w-full px-4 py-2.5 text-left text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors flex items-center gap-3 cursor-pointer"
                   >
                     <LogOut size={16} />
                     <span>Sign Out</span>

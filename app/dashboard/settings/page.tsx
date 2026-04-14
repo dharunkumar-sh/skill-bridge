@@ -137,7 +137,7 @@ export default function SettingsPage() {
         <div className="space-y-1">
           <button
             onClick={() => setActiveTab("billing")}
-            className={`w-full flex items-center gap-3 px-4 py-3 font-medium rounded-xl transition-colors ${
+            className={`w-full flex items-center gap-3 px-4 py-3 font-medium rounded-xl transition-colors cursor-pointer ${
               activeTab === "billing"
                 ? "bg-blue-600/10 text-blue-400 border border-blue-500/20"
                 : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
@@ -147,7 +147,7 @@ export default function SettingsPage() {
           </button>
           <button
             onClick={() => setActiveTab("projects")}
-            className={`w-full flex items-center gap-3 px-4 py-3 font-medium rounded-xl transition-colors ${
+            className={`w-full flex items-center gap-3 px-4 py-3 font-medium rounded-xl transition-colors cursor-pointer ${
               activeTab === "projects"
                 ? "bg-blue-600/10 text-blue-400 border border-blue-500/20"
                 : "text-slate-400 hover:text-slate-200 hover:bg-white/5"

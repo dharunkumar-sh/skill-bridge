@@ -7,6 +7,7 @@ import {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
 } from "react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
@@ -20,14 +21,23 @@ export interface User {
   mindset?: string | null;
   skillStatus?: string | null;
   careerGoal?: string | null;
+  targetRole?: string | null;
+  knownTechnologies?: string | null;
+  learningStyle?: string | null;
+  weeklyHours?: string | null;
+  workExperience?: string | null;
+  education?: string | null;
+  motivation?: string | null;
   authProvider?: string;
   githubUsername?: string | null;
+  aiAnalysis?: any;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (userData: User) => void;
   logout: () => void;
+  refreshUser: () => Promise<void>;
   isAuthModalOpen: boolean;
   setIsAuthModalOpen: (open: boolean) => void;
   authMode: "login" | "signup";
@@ -78,6 +88,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Refresh user data from the database
+  const refreshUser = useCallback(async () => {
+    const currentEmail = user?.email;
+    if (!currentEmail) return;
+
+    try {
+      const res = await fetch(`/api/user/profile?email=${encodeURIComponent(currentEmail)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          setUser(data.user);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("user", JSON.stringify(data.user));
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Failed to refresh user data:", err);
+    }
+  }, [user?.email]);
+
   return (
     <GoogleOAuthProvider clientId={clientId || ""}>
       <AuthContext.Provider
@@ -85,6 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           user,
           login,
           logout,
+          refreshUser,
           isAuthModalOpen,
           setIsAuthModalOpen,
           authMode,

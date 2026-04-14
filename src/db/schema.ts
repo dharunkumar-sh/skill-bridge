@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, boolean, jsonb, integer } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -14,5 +14,31 @@ export const users = pgTable("users", {
   mindset: text("mindset"),
   skillStatus: text("skill_status"),
   careerGoal: text("career_goal"),
+  targetRole: text("target_role"),
+  knownTechnologies: text("known_technologies"),
+  learningStyle: text("learning_style"),
+  weeklyHours: text("weekly_hours"),
+  workExperience: text("work_experience"),
+  education: text("education"),
+  motivation: text("motivation"),
+  aiAnalysis: jsonb("ai_analysis"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const userCourses = pgTable("user_courses", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  courseTitle: text("course_title").notNull(),
+  courseUrl: text("course_url"),
+  courseSource: text("course_source").notNull().default("udemy"),
+  courseThumbnail: text("course_thumbnail"),
+  courseInstructor: text("course_instructor"),
+  priority: text("priority").default("medium"),
+  status: text("status").notNull().default("enrolled"),
+  enrolledAt: timestamp("enrolled_at").defaultNow().notNull(),
+  deadlineAt: timestamp("deadline_at"),
+  completedAt: timestamp("completed_at"),
+  promptedAt: timestamp("prompted_at"),
+  notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
