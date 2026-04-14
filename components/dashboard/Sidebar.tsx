@@ -8,7 +8,6 @@ import {
   BookOpen,
   Users,
   Briefcase,
-  Settings,
   Rocket,
   FileText,
 } from "lucide-react";
@@ -22,7 +21,6 @@ export const SIDEBAR_ITEMS = [
   { name: "Mentorship", href: "/dashboard/mentorship", icon: Users },
   { name: "Jobs", href: "/dashboard/jobs", icon: Briefcase },
   { name: "Resume AI", href: "/dashboard/resume", icon: FileText },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 interface SidebarProps {

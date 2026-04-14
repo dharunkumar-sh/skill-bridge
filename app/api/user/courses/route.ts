@@ -113,6 +113,9 @@ export async function PATCH(req: Request) {
     if (notes !== undefined) {
       updateData.notes = notes;
     }
+    if (body.progress !== undefined) {
+      updateData.progress = Math.min(100, Math.max(0, parseInt(body.progress, 10)));
+    }
     updateData.promptedAt = new Date();
 
     const updated = await db

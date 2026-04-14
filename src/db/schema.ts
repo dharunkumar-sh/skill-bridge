@@ -57,6 +57,7 @@ export const userCourses = pgTable("user_courses", {
   completedAt: timestamp("completed_at"),
   promptedAt: timestamp("prompted_at"),
   notes: text("notes"),
+  progress: integer("progress").default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
